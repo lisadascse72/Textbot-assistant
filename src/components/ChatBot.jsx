@@ -2,6 +2,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import './ChatBot.css';
 
+// ✅ Importing icons from src/assets/icons
+import micOnIcon from '../assets/icons/mic-on.svg';
+// import micOffIcon from '../assets/icons/mic-off.svg';
+import sendIcon from '../assets/icons/send.svg';
+
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
 
 const ChatBot = () => {
@@ -17,7 +22,7 @@ const ChatBot = () => {
   const [loading, setLoading] = useState(false);
   const [chatModel, setChatModel] = useState(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [micActive, setMicActive] = useState(false);
+  const [isListening, setIsListening] = useState(false);
 
   useEffect(() => {
     const setup = async () => {
@@ -39,18 +44,24 @@ const ChatBot = () => {
       recog.interimResults = false;
       recog.onresult = (e) => {
         setInput(e.results[0][0].transcript);
-        setMicActive(false);
+        setIsListening(false);
       };
-      recog.onend = () => setMicActive(false);
+      recog.onend = () => setIsListening(false);
       recognitionRef.current = recog;
     }
 
-    recognitionRef.current.start();
-    setMicActive(true);
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      recognitionRef.current.start();
+      setIsListening(true);
+    }
   };
 
   const speak = (text) => {
     const synth = window.speechSynthesis;
+
     if (isSpeaking) {
       synth.cancel();
       setIsSpeaking(false);
@@ -67,10 +78,9 @@ const ChatBot = () => {
     if (!input.trim() || !chatModel) return;
 
     const tataContext = `
-You are a smart and fun assistant bot made by a girl student named "Lisa Das" from VSSUT,Burla as her a part of her internship project. 
-If someone asks regarding tata steel or steel plant operations and machinery,Respond like a Tata Steel employee would, using knowledge of manufacturing, steel plant, blast furnace, machinery, systems, safety norms, and general operations at Tata Steel.
-If the question is not related to plant,chat like a friendly person normally, fetch data from all over the internet and google. 
-If someone seems depressed or emotional or angry, be their mental strength.Try to keep your responses short yet engaging.
+You are an assistant made by Lisa Das, trained to help with Tata Steel Limited–related queries.
+Respond like a Tata Steel employee would, using knowledge of manufacturing, steel plant, blast furnace, machinery, systems, safety norms, and general operations at Tata Steel.
+If the question is not related to plant, chat like a friendly person normally.
 `;
 
     setMessages((prev) => [...prev, { sender: 'user', text: input }]);
@@ -112,15 +122,15 @@ If someone seems depressed or emotional or angry, be their mental strength.Try t
         </div>
 
         <div className="chat-input">
-          {/* ✅ Mic Button (Toggled) */}
-          <button onClick={handleVoice} title="Speak" className="icon-btn">
-            <img
-              src={micActive ? '/icons/mic-off.svg' : '/icons/mic-on.svg'}
-              alt="Mic"
-            />
-          </button>
-
-          {/* Input */}
+          {/* Mic Button */}
+          <button
+  onClick={handleVoice}
+  title="Speak"
+  className={`icon-btn mic-btn ${isListening ? 'active-mic' : ''}`}
+>
+  <img src={micOnIcon} alt="Mic" />
+</button>
+          {/* Text Input */}
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -128,9 +138,9 @@ If someone seems depressed or emotional or angry, be their mental strength.Try t
             placeholder="Type or speak..."
           />
 
-          {/* Send */}
+          {/* Send Button */}
           <button onClick={handleSend} title="Send" className="icon-btn">
-            <img src="/icons/send.svg" alt="Send" />
+            <img src={sendIcon} alt="Send" />
           </button>
         </div>
       </div>

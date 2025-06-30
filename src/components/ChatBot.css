@@ -73,11 +73,12 @@
 
 .chat-input input {
   flex: 1;
-  padding: 10px;
+  padding: 12px 14px;
   border-radius: 10px;
   border: none;
   font-size: 1rem;
   outline: none;
+  min-height: 45px;
 }
 
 /* 🖱️ Buttons */
@@ -85,11 +86,17 @@
   background: transparent;
   border: none;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
 .icon-btn img {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
 }
 
 .sound-btn {
@@ -101,13 +108,7 @@
 }
 
 /* 🎤 Mic Glow Effect */
-.mic-btn {
-  border-radius: 50%;
-  padding: 8px;
-  transition: background-color 0.3s ease;
-}
-
-.active-mic {
+.mic-btn.active-mic {
   background-color: #ff00cc;
   animation: flicker 1.2s infinite;
   box-shadow: 0 0 15px 5px #ff00cc;
@@ -131,7 +132,7 @@
   }
 
   .chat-input input {
-    padding: 8px;
+    padding: 10px;
     font-size: 0.95rem;
   }
 
@@ -140,8 +141,8 @@
   }
 
   .icon-btn img {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
   }
 
   .sound-btn {
